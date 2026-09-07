@@ -96,8 +96,10 @@ Optional, feature-gated (each fails honestly/disables itself if left blank):
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI`, `GOOGLE_SCOPES`
 - `TTS_PROVIDER_API_KEY` (narration script is always available; audio synthesis is not implemented yet)
 
-Never commit real secrets. `.gitignore` already excludes `.env`, `.venv/`,
-`__pycache__/`, and `data/*.db`.
+Never commit real secrets. `.gitignore` already excludes `.env` (and any
+`.env.*` variant except `.env.example`), `.venv/`/`venv/`/`env/`,
+`__pycache__/`, the entire `data/` directory, database/sqlite files, and
+common credential/key file patterns.
 
 ## Local
 ```bash
