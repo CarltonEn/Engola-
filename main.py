@@ -18,7 +18,7 @@ from fastapi.staticfiles import StaticFiles
 
 from core.config import APP_VERSION, STATIC_DIR
 from core.db import db
-from routers import auth, career, chat, google_oauth, health, media, memory, permissions, uganda, voice
+from routers import auth, career, chat, google_oauth, health, media, memory, permissions, uganda, voice, work
 
 app = FastAPI(title="Engola", version=APP_VERSION)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -31,6 +31,7 @@ app.include_router(media.router)
 app.include_router(career.router)
 app.include_router(uganda.router)
 app.include_router(voice.router)
+app.include_router(work.router)
 app.include_router(google_oauth.router)
 app.include_router(health.router)
 

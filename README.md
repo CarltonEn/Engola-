@@ -154,3 +154,7 @@ python tests/test_offline.py -v
 installed, register a passkey, exercise the WebAuthn flow with a real
 browser/authenticator, and hit each endpoint with a live OpenAI key. None
 of that has happened yet in this handoff.
+
+
+## v0.7 functional core
+Adds persistent Work tasks, owner-visible Memory management, real Security permission controls, functional Intelligence shortcuts, and explicit non-fake states for Files and Automations.

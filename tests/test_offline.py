@@ -223,3 +223,12 @@ if __name__ == "__main__":
     mode = "REAL fastapi/openai/webauthn" if USING_REAL_DEPENDENCIES else "OFFLINE STUBS (real deps not installed)"
     print(f"[test_offline] Running with: {mode}\n")
     unittest.main()
+
+class TestWorkRouter(unittest.TestCase):
+    def test_work_router_imports_and_routes(self):
+        from routers import work
+        paths = {(getattr(r, 'path', ''), tuple(getattr(r, 'methods', set()))) for r in work.router.routes}
+        self.assertIn(('/api/work/tasks', ('GET',)), paths)
+        self.assertIn(('/api/work/tasks', ('POST',)), paths)
+        self.assertIn(('/api/work/tasks/{task_id}', ('PATCH',)), paths)
+        self.assertIn(('/api/work/tasks/{task_id}', ('DELETE',)), paths)

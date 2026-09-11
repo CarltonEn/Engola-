@@ -51,6 +51,14 @@ def db() -> sqlite3.Connection:
         score REAL, score_breakdown TEXT, created_at REAL NOT NULL,
         updated_at REAL NOT NULL)"""
     )
+    # Additive: lightweight work/task system
+    c.execute(
+        """CREATE TABLE IF NOT EXISTS tasks(
+        id INTEGER PRIMARY KEY, title TEXT NOT NULL, notes TEXT,
+        status TEXT NOT NULL DEFAULT 'todo', priority TEXT NOT NULL DEFAULT 'normal',
+        due_at REAL, created_at REAL NOT NULL, updated_at REAL NOT NULL)"""
+    )
+
     # Additive: Google OAuth token storage (owner-only, single row)
     c.execute(
         """CREATE TABLE IF NOT EXISTS google_tokens(
