@@ -75,20 +75,6 @@ def db() -> sqlite3.Connection:
         refresh_token TEXT, scope TEXT, expires_at REAL, updated_at REAL)"""
     )
 
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS device_pairings(
-        id INTEGER PRIMARY KEY, code_hash TEXT UNIQUE NOT NULL,
-        created_at REAL NOT NULL, expires_at REAL NOT NULL, used_at REAL)"""
-    )
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS devices(
-        device_id TEXT PRIMARY KEY, name TEXT NOT NULL, platform TEXT NOT NULL,
-        model TEXT, android_version TEXT, battery_pct REAL, charging INTEGER DEFAULT 0,
-        network_type TEXT, network_name TEXT, storage_free INTEGER, storage_total INTEGER,
-        capabilities TEXT, token_hash TEXT UNIQUE NOT NULL, created_at REAL NOT NULL,
-        last_seen REAL, status TEXT NOT NULL DEFAULT 'offline')"""
-    )
-
     defaults = [
         ("phone", "ask", "contacts, files, camera, microphone, notifications"),
         ("computer", "ask", "files, apps, browser, local automation"),
