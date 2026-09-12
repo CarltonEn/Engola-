@@ -5,7 +5,7 @@ from core.knowledge import delete_source, get_source, ingest_url, list_sources, 
 from core.security import require_owner
 import json
 from urllib.parse import quote
-from urllib.request import Request, urlopen
+from urllib.request import Request as URLRequest, urlopen
 
 router = APIRouter(prefix="/api/knowledge", tags=["knowledge"])
 
@@ -49,7 +49,7 @@ def wiki_search(request: Request, query: str = ""):
     if not q:
         return {"ok": True, "results": []}
     url = "https://en.wikipedia.org/w/api.php?action=opensearch&search=" + quote(q) + "&limit=6&namespace=0&format=json"
-    req = Request(url, headers={"User-Agent": "Engola/0.11 (Wikipedia research)"})
+    req = URLRequest(url, headers={"User-Agent": "Engola/0.11 (Wikipedia research)"})
     try:
         with urlopen(req, timeout=10) as response:
             data = json.loads(response.read().decode("utf-8", errors="replace"))
