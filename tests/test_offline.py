@@ -200,13 +200,27 @@ class TestSecurityHelpers(unittest.TestCase):
     def test_rp_id_falls_back_to_host(self):
         from fastapi import Request
         from core.security import rp_id
-        req = Request(headers={"host": "example.com:8000"})
+        req = Request({
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [(b"host", b"example.com:8000")],
+            "scheme": "https",
+            "query_string": b"",
+        })
         self.assertEqual(rp_id(req), "example.com")
 
     def test_rp_id_localhost_default(self):
         from fastapi import Request
         from core.security import rp_id
-        req = Request(headers={})
+        req = Request({
+            "type": "http",
+            "method": "GET",
+            "path": "/",
+            "headers": [],
+            "scheme": "http",
+            "query_string": b"",
+        })
         self.assertEqual(rp_id(req), "localhost")
 
 
