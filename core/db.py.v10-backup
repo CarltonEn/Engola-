@@ -59,15 +59,6 @@ def db() -> sqlite3.Connection:
         due_at REAL, created_at REAL NOT NULL, updated_at REAL NOT NULL)"""
     )
 
-    # Additive: v0.11 private knowledge vault
-    c.execute(
-        """CREATE TABLE IF NOT EXISTS knowledge_sources(
-        id INTEGER PRIMARY KEY, url TEXT UNIQUE NOT NULL, title TEXT NOT NULL,
-        kind TEXT NOT NULL, status TEXT NOT NULL DEFAULT 'ready',
-        metadata TEXT NOT NULL DEFAULT '{}', text TEXT NOT NULL,
-        created_at REAL NOT NULL, updated_at REAL NOT NULL)"""
-    )
-
     # Additive: Google OAuth token storage (owner-only, single row)
     c.execute(
         """CREATE TABLE IF NOT EXISTS google_tokens(
