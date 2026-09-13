@@ -22,7 +22,7 @@ STATIC_DIR = BASE_DIR / "static"
 
 # Identity / product
 OWNER_NAME = os.getenv("ENGOLA_OWNER_NAME", "Engola Innocent")
-APP_VERSION = "0.14.0"
+APP_VERSION = "0.10.0"
 
 # Sessions
 SESSION_COOKIE = "engola_session"

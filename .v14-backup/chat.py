@@ -6,7 +6,6 @@ from core.agent import run_local
 from core.config import SYSTEM_PROMPT
 from core.db import db, memory_text, recent, save_message
 from core.security import require_owner
-from core.knowledge import search_for_chat
 
 
 router = APIRouter(prefix="/api", tags=["chat"])
@@ -68,23 +67,6 @@ async def chat(request: Request):
             "data": local.data,
         }
 
-
-    # Vault-backed evidence path works without a paid AI provider.
-    try:
-        evidence = search_for_chat(text, limit=4)
-    except Exception:
-        evidence = []
-    if evidence and not ai.is_configured():
-        blocks=[]
-        for item in evidence:
-            blocks.append(f"SOURCE: {item.get('title') or item.get('url') or 'Stored source'}\nURL: {item.get('url') or ''}\n{item.get('excerpt') or ''}")
-        answer = (
-            "I found relevant material in your Knowledge Vault. I can ground this answer in these stored sources, "
-            "but I will not pretend to have performed deeper interpretation without a reasoning provider.\n\n"
-            + "\n\n---\n\n".join(blocks)
-        )
-        save_message("assistant", answer)
-        return {"answer": answer, "mode": "knowledge", "intent": "knowledge_lookup", "action": "search_knowledge_vault", "executed": True, "verified": True, "needs_approval": False, "data": {"sources": evidence}}
 
     # Optional external reasoning provider.
     if ai.is_configured():

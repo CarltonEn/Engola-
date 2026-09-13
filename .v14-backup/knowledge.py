@@ -197,20 +197,3 @@ def import_text_source(*, url: str, title: str, kind: str, text: str, metadata: 
         source_id=cur.lastrowid
     conn.commit(); conn.close()
     return {'id':source_id,'url':url,'title':title[:300],'kind':kind,'characters':len(clean),'metadata':metadata}
-
-
-def search_for_chat(query: str, limit: int = 4) -> list[dict[str, Any]]:
-    """Return compact evidence records suitable for owner chat without an LLM."""
-    rows = search_sources(query, limit=limit)
-    out=[]
-    q=(query or "").strip().lower()
-    for row in rows:
-        text=(row.get("text") or row.get("excerpt") or "").strip()
-        if not text:
-            continue
-        pos=text.lower().find(q) if q else -1
-        if pos < 0:
-            pos=0
-        start=max(0,pos-350); end=min(len(text),pos+1400)
-        out.append({"id":row.get("id"),"title":row.get("title"),"url":row.get("url"),"kind":row.get("kind"),"excerpt":text[start:end]})
-    return out

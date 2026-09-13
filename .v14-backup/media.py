@@ -24,7 +24,6 @@ from fastapi.responses import JSONResponse
 from core import ai
 from core.config import SYSTEM_PROMPT
 from core.db import remember, save_message
-from core.knowledge import ingest_url
 from core.security import origin, require_owner
 
 router = APIRouter(prefix="/api/media", tags=["media"])
@@ -135,20 +134,7 @@ async def study_media(request: Request):
     if not url:
         return JSONResponse({"error": "Media URL required."}, status_code=400)
     if not ai.is_configured():
-        # Free-first path: acquire the public page/video transcript into the vault.
-        try:
-            source = ingest_url(url)
-            text = (source.get("text") or "").strip()
-            excerpt = text[:12000]
-            return {
-                "mode": "free",
-                "stored": True,
-                "source": {k: source.get(k) for k in ("id", "url", "title", "kind", "status", "characters")},
-                "excerpt": excerpt,
-                "message": "I did not watch or listen to the media. I acquired the publicly available text/transcript and stored it for study."
-            }
-        except Exception as e:
-            return JSONResponse({"error": f"Free media acquisition failed: {type(e).__name__}: {e}"}, status_code=502)
+        return JSONResponse({"error": "OPENAI_API_KEY is not configured on the server."}, status_code=503)
 
     prompt = STUDY_INSTRUCTIONS.format(title=title or "Unknown", url=url, note=note or "None")
     try:
