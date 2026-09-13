@@ -7,11 +7,13 @@ from core.config import SYSTEM_PROMPT
 from core.db import db, memory_text, recent, save_message
 from core.security import require_owner
 from core.knowledge import search_for_chat
+from core.gemini import configured as gemini_configured, respond as gemini_respond
+from core.persona import conversational, owner_snapshot
 
 router = APIRouter(prefix="/api", tags=["chat"])
 
 def _provider_answer(text: str) -> str:
-    prompt = SYSTEM_PROMPT + "\n\nKnown owner memory:\n" + (memory_text() or "(none)")
+    prompt = SYSTEM_PROMPT + "\n\nOwner profile:\n" + owner_snapshot() + "\n\nKnown owner memory:\n" + (memory_text() or "(none)")
     msgs = [{"role": "system", "content": prompt}]
     msgs += [{"role": role, "content": content} for role, content in recent()]
     msgs.append({"role": "user", "content": text})
@@ -53,9 +55,7 @@ async def chat(request: Request):
                     f"URL: {item.get('url') or ''}\n{item.get('excerpt') or ''}"
                 )
             answer = (
-                "I found relevant material in your Knowledge Vault. "
-                "I can ground this answer in these stored sources, but I will not "
-                "pretend to have performed deeper interpretation without a reasoning provider.\n\n"
+                "I found this in your Knowledge Vault, Sir.\n\n"
                 + "\n\n---\n\n".join(blocks)
             )
             save_message("assistant", answer)
@@ -66,11 +66,26 @@ async def chat(request: Request):
 
         if ai.is_configured():
             try:
-                answer = _provider_answer(text)
+                answer = conversational(_provider_answer(text))
             except Exception as e:
                 return JSONResponse({"ok": False, "error": f"AI request failed: {type(e).__name__}: {e}"}, status_code=502)
             save_message("assistant", answer)
             return {"ok": True, "answer": answer, "mode": "provider",
+                    "intent": "reasoning", "executed": False,
+                    "verified": True, "needs_approval": False}
+
+        if gemini_configured():
+            try:
+                msgs = [{"role": "system", "content": SYSTEM_PROMPT + "\n\nOwner profile:\n" + owner_snapshot() + "\n\nKnown owner memory:\n" + (memory_text() or "(none)")}]
+                msgs += [{"role": role, "content": content} for role, content in recent()]
+                if evidence:
+                    msgs.append({"role": "system", "content": "Relevant Knowledge Vault evidence:\n" + "\n\n".join(str(x) for x in evidence)})
+                msgs.append({"role": "user", "content": text})
+                answer = conversational(gemini_respond(msgs))
+            except Exception as e:
+                return JSONResponse({"ok": False, "error": f"Reasoning provider failed: {type(e).__name__}: {e}"}, status_code=502)
+            save_message("assistant", answer)
+            return {"ok": True, "answer": answer, "mode": "gemini",
                     "intent": "reasoning", "executed": False,
                     "verified": True, "needs_approval": False}
 

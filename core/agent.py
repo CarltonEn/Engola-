@@ -15,6 +15,7 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 from core.db import db, memory_text, remember
+from core.persona import conversational, owner_snapshot
 
 
 @dataclass
@@ -565,6 +566,32 @@ def run_local(text: str) -> AgentResult:
             data={
                 "permissions": permissions,
             },
+            executed=True,
+            verified=True,
+        )
+
+    # ---------------------------------------------------------
+    # OWNER PROFILE
+    # ---------------------------------------------------------
+    if any(phrase in normalized for phrase in (
+        "what do you know about me",
+        "what do you know about me?",
+        "tell me about myself",
+        "what do you remember about me",
+        "who am i to you",
+    )):
+        saved = memory_text() or "No extra saved notes yet."
+        answer = (
+            "Quite a bit, Sir. You’re Engola Innocent, based in Uganda, and you’re building Engola as a serious personal AI chief of staff. "
+            "Your main working territory is accounting, tax and business advisory, alongside technology, AI, Linux, Android and hardware. "
+            "Right now we’re also working on the Engola platform itself, your dx7300 revival, and practical accounting workflows.\n\n"
+            f"I also have these saved notes: {saved}"
+        )
+        return AgentResult(
+            answer=conversational(answer),
+            intent="owner.profile",
+            action="owner.profile",
+            data={"profile": owner_snapshot(), "saved_memory": saved},
             executed=True,
             verified=True,
         )
