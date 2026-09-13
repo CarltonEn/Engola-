@@ -2,8 +2,9 @@ from __future__ import annotations
 import shutil, time
 from pathlib import Path
 
-ROOT=Path(__file__).resolve().parent
-BACKUP=ROOT/'.v12-backup'
+PATCH_DIR=Path(__file__).resolve().parent
+ROOT=PATCH_DIR.parent
+BACKUP=ROOT/'.v13-backup'
 
 def backup(path):
     if path.exists():

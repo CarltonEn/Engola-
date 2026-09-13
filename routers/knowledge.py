@@ -1,9 +1,11 @@
 from __future__ import annotations
 from fastapi import APIRouter, HTTPException, Request
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
-from core.knowledge import delete_source, get_source, ingest_url, list_sources, search_sources
+from core.knowledge import delete_source, get_source, ingest_url, list_sources, search_sources, import_text_source
 from core.security import require_owner
 import json
+import os
 from urllib.parse import quote
 from urllib.request import Request as URLRequest, urlopen
 
@@ -73,3 +75,19 @@ def knowledge_delete(source_id: int, request: Request):
     if not delete_source(source_id):
         raise HTTPException(404, "Knowledge source not found")
     return {"ok": True, "deleted": source_id}
+
+
+@router.post('/import')
+def knowledge_import(body: dict, request: Request):
+    # Termux acquisition uses a separate ingestion token so WebAuthn does not
+    # need to be automated on the phone. Keep this token out of browser code.
+    expected=(os.getenv('ENGOLA_INGEST_TOKEN') or '').strip()
+    supplied=(request.headers.get('X-Engola-Ingest-Token') or '').strip()
+    if not expected or not supplied or not __import__('secrets').compare_digest(expected,supplied):
+        return JSONResponse({'error':'Invalid ingestion authorization.'},403)
+    text=(body.get('text') or '').strip()
+    url=(body.get('url') or body.get('final_url') or '').strip()
+    if not text or not url:
+        return JSONResponse({'error':'url and text are required.'},400)
+    source=import_text_source(url=url,title=(body.get('title') or url).strip(),kind=(body.get('kind') or 'external').strip(),text=text,metadata=body.get('metadata') or {k:body[k] for k in ('category','authority','sha256','archive_provider','archive_message_id','archive_file_id') if k in body})
+    return {'ok':True,'source':source}

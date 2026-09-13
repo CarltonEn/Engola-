@@ -177,3 +177,23 @@ def search_sources(query: str, limit: int = 8) -> list[dict[str, Any]]:
 
 def delete_source(source_id: int) -> bool:
     conn = db(); cur = conn.execute("DELETE FROM knowledge_sources WHERE id=?", (source_id,)); conn.commit(); conn.close(); return cur.rowcount > 0
+
+
+def import_text_source(*, url: str, title: str, kind: str, text: str, metadata: dict | None = None) -> dict:
+    """Import text acquired outside Railway (e.g. Termux) without storing the original binary."""
+    import json as _json, time as _time
+    clean=(text or '').strip()
+    if not clean: raise ValueError('No readable text supplied.')
+    clean=clean[:MAX_TEXT]
+    metadata=metadata or {}
+    conn=db()
+    existing=conn.execute('SELECT id FROM knowledge_sources WHERE url=? AND status=\'ready\' ORDER BY id DESC LIMIT 1',(url,)).fetchone()
+    if existing:
+        conn.execute('UPDATE knowledge_sources SET title=?,kind=?,metadata=?,text=?,updated_at=? WHERE id=?',(title[:300],kind,_json.dumps(metadata,ensure_ascii=False),clean,_time.time(),existing[0]))
+        source_id=existing[0]
+    else:
+        now=_time.time()
+        cur=conn.execute('INSERT INTO knowledge_sources(url,title,kind,status,metadata,text,created_at,updated_at) VALUES(?,?,?,?,?,?,?,?)',(url,title[:300],kind,'ready',_json.dumps(metadata,ensure_ascii=False),clean,now,now))
+        source_id=cur.lastrowid
+    conn.commit(); conn.close()
+    return {'id':source_id,'url':url,'title':title[:300],'kind':kind,'characters':len(clean),'metadata':metadata}

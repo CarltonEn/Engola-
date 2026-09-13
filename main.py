@@ -1,3 +1,4 @@
+from routers.media import router as media_router
 """
 Engola application entrypoint.
 
@@ -36,6 +37,7 @@ app.include_router(voice.router)
 app.include_router(work.router)
 app.include_router(google_oauth.router)
 app.include_router(health.router)
+app.include_router(media_router)
 
 
 @app.on_event("startup")
