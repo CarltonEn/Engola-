@@ -9,6 +9,10 @@ _ALLOWED = {
     "appearance": {"system", "light", "dark"},
     "blur": {"on", "off"},
     "density": {"comfortable", "compact"},
+    "voice": {"on", "off"},
+    "voice_auto": {"on", "off"},
+    "voice_locale": {"en-GB"},
+    "voice_rate": {"0.85", "0.95", "1.0", "1.1"},
 }
 
 def _ensure():
@@ -31,6 +35,10 @@ def get_preferences(request: Request):
     data.setdefault("appearance", "system")
     data.setdefault("blur", "on")
     data.setdefault("density", "comfortable")
+    data.setdefault("voice", "on")
+    data.setdefault("voice_auto", "off")
+    data.setdefault("voice_locale", "en-GB")
+    data.setdefault("voice_rate", "0.95")
     return {"ok": True, "preferences": data}
 
 @router.post("")

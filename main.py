@@ -21,7 +21,7 @@ from fastapi.staticfiles import StaticFiles
 
 from core.config import APP_VERSION, STATIC_DIR
 from core.db import db
-from routers import auth, career, chat, device, google_oauth, health, knowledge, media, memory, permissions, uganda, voice, work
+from routers import auth, career, chat, device, github_oauth, google_oauth, health, knowledge, media, memory, permissions, uganda, voice, work
 
 app = FastAPI(title="Engola", version=APP_VERSION)
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
@@ -38,6 +38,7 @@ app.include_router(uganda.router)
 app.include_router(voice.router)
 app.include_router(work.router)
 app.include_router(google_oauth.router)
+app.include_router(github_oauth.router)
 app.include_router(health.router)
 app.include_router(media_router)
 app.include_router(capabilities_router)
@@ -53,5 +54,5 @@ def startup():
 def home():
     html = (STATIC_DIR / "index.html").read_text()
     marker = '</head>'
-    addons = '<link rel="stylesheet" href="/static/engola-v11.css"><script defer src="/static/engola-v11.js"></script><link rel="stylesheet" href="/static/engola-v12.css"><script defer src="/static/engola-v12.js"></script>'
+    addons = '<link rel="stylesheet" href="/static/engola-v11.css"><script defer src="/static/engola-v11.js"></script><link rel="stylesheet" href="/static/engola-v12.css"><script defer src="/static/engola-v12.js"></script><link rel="stylesheet" href="/static/engola-v16.css"><script defer src="/static/engola-v16.js"></script>'
     return HTMLResponse(html.replace(marker, addons + marker, 1))

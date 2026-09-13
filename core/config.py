@@ -42,6 +42,10 @@ ENGOLA_MODEL = os.getenv("ENGOLA_MODEL", "gpt-5.6")
 
 # Google OAuth (owner-provided; absent by default -> feature reports
 # "not configured" rather than faking success)
+GITHUB_CLIENT_ID = os.getenv("GITHUB_CLIENT_ID", "").strip()
+GITHUB_CLIENT_SECRET = os.getenv("GITHUB_CLIENT_SECRET", "").strip()
+GITHUB_REDIRECT_URI = os.getenv("GITHUB_REDIRECT_URI", "").strip()
+GITHUB_SCOPES = os.getenv("GITHUB_SCOPES", "repo read:user").strip()
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "").strip()
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "").strip()
