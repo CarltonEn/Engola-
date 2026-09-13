@@ -22,8 +22,7 @@ STATIC_DIR = BASE_DIR / "static"
 
 # Identity / product
 OWNER_NAME = os.getenv("ENGOLA_OWNER_NAME", "Engola Innocent")
-APP_VERSION = "0.19.0"
-
+APP_VERSION = "1.0.0"
 # Sessions
 SESSION_COOKIE = "engola_session"
 SESSION_TTL = int(os.getenv("SESSION_TTL_SECONDS", "43200"))
@@ -53,7 +52,7 @@ GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "").strip()
 GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "").strip()
 GOOGLE_SCOPES = os.getenv(
     "GOOGLE_SCOPES",
-    "openid email profile https://www.googleapis.com/auth/calendar.readonly",
+    "openid email profile https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/gmail.readonly",
 ).strip()
 
 SYSTEM_PROMPT = f"""You are Engola, the private AI chief of staff for {OWNER_NAME}, the sole owner.

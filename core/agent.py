@@ -160,11 +160,11 @@ def _complete_task(task_id: int) -> Optional[Dict[str, Any]]:
 
 def _extract_task_title(text: str) -> str:
     patterns = [
-        r"(?:create|add|make)\s+(?:a\s+)?task\s+(?:called|named)\s+(.+)$",
-        r"(?:create|add|make)\s+(?:a\s+)?task\s+to\s+(.+)$",
-        r"(?:create|add|make)\s+(?:a\s+)?task\s+(.+)$",
-        r"(?:remind me to)\s+(.+)$",
-        r"(?:task:)\s*(.+)$",
+        '(?:create|add|make)\\s+(?:(?:a|an|the)\\s+)?(?:(?:high|urgent|critical)\\s+priority\\s+)?task\\s+(?:called|named)\\s+(.+)$',
+        '(?:create|add|make)\\s+(?:(?:a|an|the)\\s+)?(?:(?:high|urgent|critical)\\s+priority\\s+)?task\\s+to\\s+(.+)$',
+        '(?:create|add|make)\\s+(?:(?:a|an|the)\\s+)?(?:(?:high|urgent|critical)\\s+priority\\s+)?task\\s+(.+)$',
+        '(?:remind me to)\\s+(.+)$',
+        '(?:task:)\\s*(.+)$'
     ]
 
     for pattern in patterns:
@@ -172,6 +172,7 @@ def _extract_task_title(text: str) -> str:
         if match:
             title = match.group(1).strip()
             title = re.sub(r"\s+", " ", title)
+            title = re.sub(r"^(?:high|urgent|critical)\s+priority\s+", "", title, flags=re.I)
             return title.rstrip(". ")
 
     return text.strip()
@@ -193,6 +194,12 @@ def _extract_memory(text: str) -> Optional[tuple]:
 
             if key and value:
                 return key, value
+
+    match = re.match(r"^(?:please\s+)?(?:remember|keep in mind)\s+(?:that\s+)?(.+)$", text.strip(), re.IGNORECASE)
+    if match:
+        statement = re.sub(r"\s+", " ", match.group(1).strip()).rstrip(". ")
+        if statement:
+            return "owner_note", statement
 
     return None
 
@@ -306,7 +313,11 @@ def run_local(text: str) -> AgentResult:
         remember(key, value)
 
         return AgentResult(
-            answer=f"Remembered: {key} = {value}",
+            answer=(
+                f"Got it, Sir. I'll remember that {value}."
+                if key == "owner_note"
+                else f"Got it, Sir. I'll remember {key} = {value}."
+            ),
             intent="memory.save",
             action="memory.save",
             data={
@@ -424,7 +435,9 @@ def run_local(text: str) -> AgentResult:
     if (
         re.search(
             r"\b(create|add|make)\s+"
-            r"(?:a\s+)?task\b",
+            r"(?:(?:a|an|the)\s+)?"
+            r"(?:(?:high|urgent|critical)\s+priority\s+)?"
+            r"task\b",
             normalized,
         )
         or normalized.startswith("remind me to ")

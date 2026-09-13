@@ -24,15 +24,15 @@ function buildConnections(){
  bindConnections(); loadConnectionStatus();
 }
 async function loadConnectionStatus(){
- try{const d=await api('/api/google/status');$('v16GoogleStatus').textContent=d.connected?'Connected':'Not connected'+(d.configured?' — ready to authorise':' — server OAuth not configured');$('v16GoogleStatus').className='v16-status '+(d.connected?'v16-good':'v16-warn')}catch(e){$('v16GoogleStatus').textContent=e.message}
- try{const d=await api('/api/github/status');$('v16GithubStatus').textContent=d.connected?'Connected':'Not connected'+(d.configured?' — ready to authorise':' — server OAuth not configured');$('v16GithubStatus').className='v16-status '+(d.connected?'v16-good':'v16-warn')}catch(e){$('v16GithubStatus').textContent=e.message}
+ try{const d=await api('/api/integrations/status');$('v16GoogleStatus').textContent=d.connected?'Connected':'Not connected'+(d.configured?' — ready to authorise':' — server OAuth not configured');$('v16GoogleStatus').className='v16-status '+(d.connected?'v16-good':'v16-warn')}catch(e){$('v16GoogleStatus').textContent=e.message}
+ try{const d=await api('/api/integrations/status');$('v16GithubStatus').textContent=d.connected?'Connected':'Not connected'+(d.configured?' — ready to authorise':' — server OAuth not configured');$('v16GithubStatus').className='v16-status '+(d.connected?'v16-good':'v16-warn')}catch(e){$('v16GithubStatus').textContent=e.message}
  $('v16VoiceToggle').textContent='Voice: '+(voicePrefs.voice==='on'?'ON':'OFF');$('v16AutoToggle').textContent='Auto-speak: '+(voicePrefs.voice_auto==='on'?'ON':'OFF');
 }
 function bindConnections(){
- $('v16Google').onclick=()=>location.href='/api/google/authorize';
- $('v16GoogleOff').onclick=async()=>{try{await api('/api/google/disconnect',{method:'POST'});loadConnectionStatus()}catch(e){alert(e.message)}};
- $('v16Github').onclick=()=>location.href='/api/github/authorize';
- $('v16GithubOff').onclick=async()=>{try{await api('/api/github/disconnect',{method:'POST'});loadConnectionStatus()}catch(e){alert(e.message)}};
+ $('v16Google').onclick=()=>location.href='/api/integrations/google/authorize';
+ $('v16GoogleOff').onclick=async()=>{try{await api('/api/integrations/google/disconnect',{method:'POST'});loadConnectionStatus()}catch(e){alert(e.message)}};
+ $('v16Github').onclick=()=>location.href='/api/integrations/github/authorize';
+ $('v16GithubOff').onclick=async()=>{try{await api('/api/integrations/github/disconnect',{method:'POST'});loadConnectionStatus()}catch(e){alert(e.message)}};
  $('v16Pair').onclick=async()=>{try{const d=await api('/api/device/pair',{method:'POST'});$('v16PairCode').innerHTML='<div class="v16-device-code">'+esc(d.code||'')+'</div><div class="v16-status">Enter this one-time code on the device agent. It expires shortly and is single-use.</div>'}catch(e){$('v16PairStatus').textContent=e.message}};
  $('v16VoiceTest').onclick=()=>{if(speak('Good to have you back, Sir. How may I assist you today?'))$('v16VoiceStatus').textContent='British English voice requested (en-GB).';else $('v16VoiceStatus').textContent='Speech synthesis is unavailable in this browser.'};
  $('v16VoiceToggle').onclick=async()=>{await savePref('voice',voicePrefs.voice==='on'?'off':'on');loadConnectionStatus()};

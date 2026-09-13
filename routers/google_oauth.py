@@ -131,7 +131,7 @@ def google_callback(request: Request, code: str = None, state: str = None, error
     )
     c.commit()
     c.close()
-    return {"ok": True, "connected": True}
+    return RedirectResponse("/?google=connected")
 
 
 @router.post("/disconnect")
